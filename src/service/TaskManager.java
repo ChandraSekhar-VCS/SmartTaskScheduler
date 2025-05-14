@@ -13,9 +13,6 @@ import java.util.List;
 public class TaskManager {
     private final List<Task> taskList;
 
-    /**
-     * TaskManager constructor that initializes the taskList with a new ArrayList
-     */
     public TaskManager(List<Task> preloadedTasks) {
         this.taskList = preloadedTasks != null ? preloadedTasks : new ArrayList<>();
     }
@@ -24,24 +21,12 @@ public class TaskManager {
         return taskList;
     }
 
-    /**
-     * Adds task to the Task Managers Task list
-     *
-     * <p>Takes task name and the due date as an input and creates a new task and add it to the list</p>
-     * @param name - name of the task
-     * @param dueDateTime - LocalDateTime indicating the due date of the task
-     */
     public void addTask(String name, LocalDateTime dueDateTime, RecurrenceType recurrenceType) {
         Task task = new Task(name, dueDateTime,recurrenceType);
         taskList.add(task);
         System.out.println("Added Task: " + task.getName());
     }
 
-    /**
-     * Deletes the task with the specified task ID
-     * @param taskId - the id of the task to be deleted
-     * @return if task with specified id is found deletes and returns true, else false
-     */
     public boolean deleteTask(String taskId){
         for (Task task : taskList){
             if (task.getId().equals(taskId)){
@@ -52,9 +37,6 @@ public class TaskManager {
         return false;
     }
 
-    /**
-     * Prints all the tasks that are available
-     */
     public void listAllTasks(){
         if(taskList.isEmpty()){
             System.out.println("No Tasks available");
@@ -66,9 +48,6 @@ public class TaskManager {
         }
     }
 
-    /**
-     * Prints a list of task that are overdue
-     */
     public void listOverdueTasks(){
         if(taskList.isEmpty()){
             System.out.println("No Tasks available");
@@ -82,9 +61,6 @@ public class TaskManager {
         }
     }
 
-    /**
-     * Prints a list of tasks that are due Today
-     */
     public void listTasksDueToday(){
         LocalDate today =  LocalDate.now();
         boolean found = false;
@@ -100,7 +76,7 @@ public class TaskManager {
                     effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
                 }
             }
-            if(effectiveDueDate.isBefore(today)){
+            if(effectiveDueDate.isEqual(today)){
                 found = true;
                 System.out.println(task.getName() + " → Due Today (" + effectiveDueDate + ") [Recurs: " + recurrence + "]");
             }
@@ -109,9 +85,7 @@ public class TaskManager {
             System.out.println("No Tasks due today");
         }
     }
-    /**
-     * Prints a List fo tasks that are due the current week
-     */
+
     public void listTasksDueThisWeek(){
         LocalDate weekStart = DateUtils.getStartOfWeek();
         LocalDate weekEnd = DateUtils.getEndOfWeek();
@@ -128,7 +102,7 @@ public class TaskManager {
                     effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
                 }
             }
-            if(effectiveDueDate.isBefore(weekStart) && !effectiveDueDate.isAfter(weekEnd)){
+            if (!effectiveDueDate.isBefore(weekStart) && !effectiveDueDate.isAfter(weekEnd)) {
                 found = true;
                 System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
             }
@@ -138,9 +112,6 @@ public class TaskManager {
         }
     }
 
-    /**
-     * Prints a List of tasks that are due the current month
-     */
     public void listTasksDueThisMonth() {
         LocalDate monthStart = DateUtils.getStartOfMonth();
         LocalDate monthEnd = DateUtils.getEndOfMonth();
@@ -173,18 +144,6 @@ public class TaskManager {
         }
     }
 
-
-    /**
-     * Method to get the time remaining for the specified task
-     *
-     * <p>
-     *     Takes taskId as a parameter and checks if a task with the specified task is present or not
-     *     If present returns the time remaining for the specified task
-     *     If not present the returns "Task not found"
-     * </p>
-     * @param taskId - the ID of the task for which the remaining time has to be calculated
-     * @return time remaining of task is present else returns Task not found
-     */
     public String getTimeRemaining(String taskId){
         for(Task task : taskList){
             if(task.getId().equals(taskId)){
@@ -194,9 +153,6 @@ public class TaskManager {
         return "Task not found";
     }
 
-    /**
-     * Sorts the tasks List based on the due date and prints them in order
-     */
     public void sortTasksByDeadline(){
         taskList.sort(Comparator.comparing(Task::getDueDateTime));
         for(Task task : taskList){
