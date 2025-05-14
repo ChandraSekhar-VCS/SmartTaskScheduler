@@ -26,6 +26,7 @@ public class Main {
             System.out.println("7. View This Month's Tasks");
             System.out.println("8. View Time Remaining (by ID)");
             System.out.println("9. Sort Tasks by Deadline");
+            System.out.println("10. Mark TAsk as Done");
             System.out.println("0. Exit");
             System.out.print("Select an option: ");
 
@@ -91,6 +92,18 @@ public class Main {
 
                 case "9":
                     taskManager.sortTasksByDeadline();
+                    break;
+
+                case "10":
+                    System.out.print("Enter task ID to mark as done: ");
+                    String doneId = scanner.nextLine();
+                    boolean marked = taskManager.markTaskAsDone(doneId);
+                    if (marked) {
+                        System.out.println("Task marked as completed.");
+                        TaskPersistenceService.saveTasks(taskManager.getTaskList());
+                    } else {
+                        System.out.println("Task not found or already completed.");
+                    }
                     break;
 
                 case "0":

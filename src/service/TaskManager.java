@@ -4,7 +4,6 @@ import model.RecurrenceType;
 import model.Task;
 import util.DateUtils;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +37,16 @@ public class TaskManager {
         return false;
     }
 
+    public boolean markTaskAsDone(String taskId) {
+        for (Task task : taskList) {
+            if (task.getId().equals(taskId) && !task.isDone()) {
+                task.markAsDone();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void listAllTasks(){
 
         if(taskList.isEmpty()){
@@ -45,7 +54,9 @@ public class TaskManager {
         }
         else{
             for(Task task : taskList){
-                System.out.println(task + "---" + task.getDueDateTime());
+                if (!task.isDone()) {
+                    System.out.println(task + " " + task.getDueSoonLable());
+                }
             }
         }
     }
@@ -57,7 +68,9 @@ public class TaskManager {
         else{
             for(Task task : taskList){
                 if(task.isOverdue()){
-                    System.out.println(task);
+                    if (!task.isDone()) {
+                        System.out.println(task + " " + task.getDueSoonLable());
+                    }
                 }
             }
         }
@@ -71,16 +84,18 @@ public class TaskManager {
             return;
         }
         for(Task task : taskList){
-            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
-            RecurrenceType recurrence = task.getRecurrenceType();
-            if(recurrence != RecurrenceType.NONE){
-                while(effectiveDueDate.isBefore(today)){
-                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+            if(!task.isDone()){
+                LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+                RecurrenceType recurrence = task.getRecurrenceType();
+                if(recurrence != RecurrenceType.NONE){
+                    while(effectiveDueDate.isBefore(today)){
+                        effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                    }
                 }
-            }
-            if(effectiveDueDate.isEqual(today)){
-                found = true;
-                System.out.println(task.getName() + " → Due Today (" + effectiveDueDate + ") [Recurs: " + recurrence + "]");
+                if(effectiveDueDate.isEqual(today)){
+                    found = true;
+                    System.out.println(task.getName() + " → Due Today (" + effectiveDueDate + ") [Recurs: " + recurrence + "]");
+                }
             }
         }
         if(!found){
@@ -97,16 +112,18 @@ public class TaskManager {
             return;
         }
         for(Task task : taskList){
-            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
-            RecurrenceType recurrence = task.getRecurrenceType();
-            if(recurrence != RecurrenceType.NONE){
-                while(effectiveDueDate.isBefore(weekStart)){
-                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+            if(!task.isDone()){
+                LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+                RecurrenceType recurrence = task.getRecurrenceType();
+                if(recurrence != RecurrenceType.NONE){
+                    while(effectiveDueDate.isBefore(weekStart)){
+                        effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                    }
                 }
-            }
-            if (!effectiveDueDate.isBefore(weekStart) && !effectiveDueDate.isAfter(weekEnd)) {
-                found = true;
-                System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
+                if (!effectiveDueDate.isBefore(weekStart) && !effectiveDueDate.isAfter(weekEnd)) {
+                    found = true;
+                    System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
+                }
             }
         }
         if(!found){
@@ -125,19 +142,21 @@ public class TaskManager {
         }
 
         for (Task task : taskList) {
-            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
-            RecurrenceType recurrence = task.getRecurrenceType();
+            if(!task.isDone()) {
+                LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+                RecurrenceType recurrence = task.getRecurrenceType();
 
-            // Adjust recurring tasks forward into this month
-            if (recurrence != RecurrenceType.NONE) {
-                while (effectiveDueDate.isBefore(monthStart)) {
-                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                // Adjust recurring tasks forward into this month
+                if (recurrence != RecurrenceType.NONE) {
+                    while (effectiveDueDate.isBefore(monthStart)) {
+                        effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                    }
                 }
-            }
 
-            if (!effectiveDueDate.isBefore(monthStart) && !effectiveDueDate.isAfter(monthEnd)) {
-                found = true;
-                System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
+                if (!effectiveDueDate.isBefore(monthStart) && !effectiveDueDate.isAfter(monthEnd)) {
+                    found = true;
+                    System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
+                }
             }
         }
 

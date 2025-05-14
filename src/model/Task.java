@@ -16,6 +16,7 @@ public class Task implements Serializable {
     private LocalDateTime dueDateTime;
     private final LocalDateTime createdAt;
     private RecurrenceType recurrenceType;
+    private boolean done = false;
 
     public Task(String name, LocalDateTime dueDateTime, RecurrenceType recurrenceType) {
         this.id = UUID.randomUUID().toString();
@@ -39,6 +40,7 @@ public class Task implements Serializable {
         return createdAt;
     }
     public RecurrenceType getRecurrenceType() {return recurrenceType;}
+    public boolean isDone() {return done;}
 
     //SETTERS
     public void setName(String name) {
@@ -48,6 +50,7 @@ public class Task implements Serializable {
         this.dueDateTime = dueDateTime;
     }
     public void setRecurrenceType(RecurrenceType recurrenceType) {this.recurrenceType = recurrenceType;}
+    public void markAsDone() {done = true;}
 
     public boolean isOverdue() {
         if (recurrenceType == RecurrenceType.NONE) {
@@ -102,7 +105,7 @@ public class Task implements Serializable {
         return next;
     }
 
-    public String getDoubleSoonLable(){
+    public String getDueSoonLable(){
         LocalDateTime  now =  LocalDateTime.now();
         LocalDateTime nextDueDate = getNextDueDate();
         Duration duration = Duration.between(now, nextDueDate);
@@ -127,6 +130,7 @@ public class Task implements Serializable {
                 "\nCreated: " + createdAt.format(FORMATTER) +
                 "\nStatus: " + (isOverdue() ? "Overdue" : "Active") +
                 "\nTime Left: " + timeRemaining() +
-                "\nRecurs: " + recurrenceType;
+                "\nRecurs: " + recurrenceType +
+                "\nCompleted: " + (done ? "✅ Yes" : "❌ No");
     }
 }
