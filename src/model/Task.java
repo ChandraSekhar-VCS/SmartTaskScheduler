@@ -26,7 +26,7 @@ public class Task implements Serializable {
     private String name;
     private LocalDateTime dueDateTime;
     private final LocalDateTime createdAt;
-
+    private RecurrenceType recurrenceType;
     /**
      * Constructs a Task with the given name and due date-time.
      * Automatically generates a unique task ID and sets creation time to the current moment.
@@ -35,11 +35,12 @@ public class Task implements Serializable {
      * @param dueDateTime the date and time by which the task is due
      */
 
-    public Task(String name, LocalDateTime dueDateTime){
+    public Task(String name, LocalDateTime dueDateTime, RecurrenceType recurrenceType) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
         this.dueDateTime = dueDateTime;
         this.createdAt = LocalDateTime.now();
+        this.recurrenceType = recurrenceType;
     }
 
     //GETTERS
@@ -55,6 +56,7 @@ public class Task implements Serializable {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+    public RecurrenceType getRecurrenceType() {return recurrenceType;}
 
     //SETTERS
     public void setName(String name) {
@@ -63,6 +65,7 @@ public class Task implements Serializable {
     public void setDueDateTime(LocalDateTime dueDateTime) {
         this.dueDateTime = dueDateTime;
     }
+    public void setrecurrenceType(RecurrenceType recurrenceType) {this.recurrenceType = recurrenceType;}
 
     /**
      * Checks whether the task is overdue.
@@ -97,7 +100,8 @@ public class Task implements Serializable {
     public String toString() {
         return "[" + id + "] " + name + "\nDue: " + dueDateTime.format(FORMATTER) +
                 "\nCreated: " + createdAt.format(FORMATTER) +
-                "\nStatus: " + (isOverdue() ? "❌ Overdue" : "✅ Active") +
-                "\nTime Left: " + timeRemaining();
+                "\nStatus: " + (isOverdue() ? "Overdue" : "✅ Active") +
+                "\nTime Left: " + timeRemaining() +
+                "\nRecurs: " + recurrenceType;
     }
 }

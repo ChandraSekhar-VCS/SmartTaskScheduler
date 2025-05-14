@@ -1,3 +1,4 @@
+import model.RecurrenceType;
 import model.Task;
 import persistance.TaskPersistenceService;
 import service.TaskManager;
@@ -37,12 +38,15 @@ public class Main {
 
                     System.out.print("Enter due date and time (dd-MM-yyyy HH:mm): ");
                     String dueInput = scanner.nextLine();
+                    System.out.print("Choose the recurrence type (NONE / DAILY / WEEKLY / MONTHLY): ");
+                    String recurrenceInput = scanner.nextLine();
                     try {
                         LocalDateTime dueDateTime = DateUtils.parseDateTime(dueInput);
-                        taskManager.addTask(name, dueDateTime);
+                        RecurrenceType recurrenceType = RecurrenceType.valueOf(recurrenceInput.toUpperCase());
+                        taskManager.addTask(name, dueDateTime, recurrenceType);
                         TaskPersistenceService.saveTasks(taskManager.getTaskList());
                     } catch (InvalidDateFormatException e) {
-                        System.out.println("❌ Error: " + e.getMessage());
+                        System.out.println("Error: " + e.getMessage());
                     }
                     break;
 

@@ -1,5 +1,7 @@
 package util;
 
+import model.RecurrenceType;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -38,6 +40,19 @@ public class DateUtils {
                     return date.plusDays(1);
             }
         };
+    }
+
+    public static LocalDate incrementDate(LocalDate date, RecurrenceType recurrenceType){
+        switch (recurrenceType){
+            case DAILY :
+                return date.plusDays(1);
+            case WEEKLY:
+                return date.plusWeeks(1);
+            case MONTHLY:
+                return date.plusMonths(1);
+            default:
+                return date;
+        }
     }
 
     public static String formatDuration(Duration duration) {

@@ -1,17 +1,17 @@
 package service;
 
+import model.RecurrenceType;
 import model.Task;
+import util.DateUtils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class TaskManager {
-    private List<Task> taskList;
+    private final List<Task> taskList;
 
     /**
      * TaskManager constructor that initializes the taskList with a new ArrayList
@@ -31,8 +31,8 @@ public class TaskManager {
      * @param name - name of the task
      * @param dueDateTime - LocalDateTime indicating the due date of the task
      */
-    public void addTask(String name, LocalDateTime dueDateTime){
-        Task task = new Task(name, dueDateTime);
+    public void addTask(String name, LocalDateTime dueDateTime, RecurrenceType recurrenceType) {
+        Task task = new Task(name, dueDateTime,recurrenceType);
         taskList.add(task);
         System.out.println("Added Task: " + task.getName());
     }
@@ -87,49 +87,92 @@ public class TaskManager {
      */
     public void listTasksDueToday(){
         LocalDate today =  LocalDate.now();
+        boolean found = false;
         if(taskList.isEmpty()){
             System.out.println("No Tasks available");
+            return;
         }
-        else{
-            for(Task task : taskList){
-                LocalDate dueDate = task.getDueDateTime().toLocalDate();
-                if(dueDate.isEqual(today)){
-                    System.out.println(task);
+        for(Task task : taskList){
+            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+            RecurrenceType recurrence = task.getRecurrenceType();
+            if(recurrence != RecurrenceType.NONE){
+                while(effectiveDueDate.isBefore(today)){
+                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
                 }
             }
+            if(effectiveDueDate.isBefore(today)){
+                found = true;
+                System.out.println(task.getName() + " → Due Today (" + effectiveDueDate + ") [Recurs: " + recurrence + "]");
+            }
+        }
+        if(!found){
+            System.out.println("No Tasks due today");
         }
     }
     /**
      * Prints a List fo tasks that are due the current week
      */
     public void listTasksDueThisWeek(){
-        LocalDate today =  LocalDate.now();
-        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+        LocalDate weekStart = DateUtils.getStartOfWeek();
+        LocalDate weekEnd = DateUtils.getEndOfWeek();
+        boolean found = false;
+        if(taskList.isEmpty()){
+            System.out.println("No Tasks available");
+            return;
+        }
         for(Task task : taskList){
-            LocalDate dueDate = task.getDueDateTime().toLocalDate();
-            if((dueDate.isEqual(weekStart) || dueDate.isAfter(weekStart)) &&
-                    (dueDate.isEqual(weekEnd) || dueDate.isBefore(weekEnd))){
-                System.out.println(task);
+            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+            RecurrenceType recurrence = task.getRecurrenceType();
+            if(recurrence != RecurrenceType.NONE){
+                while(effectiveDueDate.isBefore(weekStart)){
+                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                }
             }
+            if(effectiveDueDate.isBefore(weekStart) && !effectiveDueDate.isAfter(weekEnd)){
+                found = true;
+                System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
+            }
+        }
+        if(!found){
+            System.out.println("No Tasks due this week");
         }
     }
 
     /**
      * Prints a List of tasks that are due the current month
      */
-    public void listTasksDueThisMonth(){
-        LocalDate today =  LocalDate.now();
-        LocalDate monthStart = today.with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate monthEnd = today.with(TemporalAdjusters.lastDayOfMonth());
-        for(Task task : taskList){
-            LocalDate dueDate =  task.getDueDateTime().toLocalDate();
-            if((dueDate.isEqual(monthStart) || dueDate.isAfter(monthStart)) &&
-                    (dueDate.isEqual(monthEnd) || dueDate.isBefore(monthEnd))){
-                System.out.println(task);
+    public void listTasksDueThisMonth() {
+        LocalDate monthStart = DateUtils.getStartOfMonth();
+        LocalDate monthEnd = DateUtils.getEndOfMonth();
+        boolean found = false;
+
+        if (taskList.isEmpty()) {
+            System.out.println("No tasks available.");
+            return;
+        }
+
+        for (Task task : taskList) {
+            LocalDate effectiveDueDate = task.getDueDateTime().toLocalDate();
+            RecurrenceType recurrence = task.getRecurrenceType();
+
+            // Adjust recurring tasks forward into this month
+            if (recurrence != RecurrenceType.NONE) {
+                while (effectiveDueDate.isBefore(monthStart)) {
+                    effectiveDueDate = DateUtils.incrementDate(effectiveDueDate, recurrence);
+                }
+            }
+
+            if (!effectiveDueDate.isBefore(monthStart) && !effectiveDueDate.isAfter(monthEnd)) {
+                found = true;
+                System.out.println(task.getName() + " → Due on " + effectiveDueDate + " [Recurs: " + recurrence + "]");
             }
         }
+
+        if (!found) {
+            System.out.println("No tasks due this month.");
+        }
     }
+
 
     /**
      * Method to get the time remaining for the specified task
