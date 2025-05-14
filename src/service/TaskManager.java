@@ -16,8 +16,12 @@ public class TaskManager {
     /**
      * TaskManager constructor that initializes the taskList with a new ArrayList
      */
-    public TaskManager() {
-        taskList = new ArrayList<>();
+    public TaskManager(List<Task> preloadedTasks) {
+        this.taskList = preloadedTasks != null ? preloadedTasks : new ArrayList<>();
+    }
+
+    public List<Task> getTaskList() {
+        return taskList;
     }
 
     /**

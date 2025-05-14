@@ -1,16 +1,18 @@
 import model.Task;
+import persistance.TaskPersistenceService;
 import service.TaskManager;
 import util.DateUtils;
 import util.InvalidDateFormatException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        TaskManager taskManager = new TaskManager();
-
+        List<Task> tasks = TaskPersistenceService.loadTasks();
+        TaskManager taskManager = new TaskManager(tasks);
         boolean running = true;
         while (running) {
             System.out.println("\n=== Smart Task Scheduler ===");
@@ -38,6 +40,7 @@ public class Main {
                     try {
                         LocalDateTime dueDateTime = DateUtils.parseDateTime(dueInput);
                         taskManager.addTask(name, dueDateTime);
+                        TaskPersistenceService.saveTasks(taskManager.getTaskList());
                     } catch (InvalidDateFormatException e) {
                         System.out.println("❌ Error: " + e.getMessage());
                     }
@@ -47,7 +50,13 @@ public class Main {
                     System.out.print("Enter task ID to delete: ");
                     String deleteId = scanner.nextLine();
                     boolean deleted = taskManager.deleteTask(deleteId);
-                    System.out.println(deleted ? "Task deleted." : "Task not found.");
+                    if(deleted){
+                        TaskPersistenceService.saveTasks(taskManager.getTaskList());
+                        System.out.println("Task deleted successfully");
+                    }
+                    else {
+                        System.out.println("Task not found");
+                    }
                     break;
 
                 case "3":
@@ -81,6 +90,7 @@ public class Main {
                     break;
 
                 case "0":
+                    TaskPersistenceService.saveTasks(taskManager.getTaskList());
                     running = false;
                     System.out.println("Exiting Smart Task Scheduler...");
                     break;

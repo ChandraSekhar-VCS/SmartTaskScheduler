@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -19,7 +20,8 @@ import java.util.UUID;
  * @author <a href="https://github.com/ChandraSekhar-VCS">Chandra Sekhar Vipparla</a>
  * @since 1.0
  */
-public class Task {
+public class Task implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String id;
     private String name;
     private LocalDateTime dueDateTime;
