@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 public class Task implements Serializable {
@@ -90,12 +89,43 @@ public class Task implements Serializable {
         return DateUtils.formatDuration(duration);
     }
 
+    public LocalDateTime getNextDueDate(){
+        LocalDateTime next = dueDateTime;
+        while(next.isBefore(LocalDateTime.now())){
+            switch (recurrenceType){
+                case DAILY: next = next.plusDays(1); break;
+                case WEEKLY: next = next.plusWeeks(1); break;
+                case MONTHLY: next = next.plusMonths(1); break;
+                default: break;
+            }
+        }
+        return next;
+    }
+
+    public String getDoubleSoonLable(){
+        LocalDateTime  now =  LocalDateTime.now();
+        LocalDateTime nextDueDate = getNextDueDate();
+        Duration duration = Duration.between(now, nextDueDate);
+        if(duration.isNegative()){
+            return "Overdue";
+        }
+        else if(duration.toHours() <= 1){
+            return "Due in Less than 1 Hour";
+        }
+        else if(duration.toHours() <= 24){
+            return "Due Today";
+        }
+        else{
+            return "";
+        }
+    }
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     @Override
     public String toString() {
         return "[" + id + "] " + name + "\nDue: " + dueDateTime.format(FORMATTER) +
                 "\nCreated: " + createdAt.format(FORMATTER) +
-                "\nStatus: " + (isOverdue() ? "Overdue" : "✅ Active") +
+                "\nStatus: " + (isOverdue() ? "Overdue" : "Active") +
                 "\nTime Left: " + timeRemaining() +
                 "\nRecurs: " + recurrenceType;
     }

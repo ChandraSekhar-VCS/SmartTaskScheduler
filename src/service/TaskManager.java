@@ -4,6 +4,7 @@ import model.RecurrenceType;
 import model.Task;
 import util.DateUtils;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,12 +39,13 @@ public class TaskManager {
     }
 
     public void listAllTasks(){
+
         if(taskList.isEmpty()){
             System.out.println("No Tasks available");
         }
         else{
             for(Task task : taskList){
-                System.out.println(task);
+                System.out.println(task + "---" + task.getDueDateTime());
             }
         }
     }
